@@ -1,14 +1,22 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.User;
+import com.example.demo.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 // 스포츠 센터
 // 역할(ROLE - 인가) : user, manager ,admin
 
 @Log4j2
 @Controller //- 각 메서드가 view를 리턴한다.
+@RequiredArgsConstructor
 public class IndexController {
+    private final MemberService memberService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     //http://localhost:8000 or http://localhost:8000/
     @GetMapping({"","/"})
     public String index(){
@@ -61,5 +69,19 @@ public class IndexController {
         log.info("login-error");
         return "loginError";
     }//end of loginError
+    //회원가입 구현하기
+    @PostMapping("/join")
+    public String join(User user){
+        log.info("join");
+        user.setRole("ROLE_USER");
+        // 패스워드 암호화 하기
+        String rawPassword = user.getPassword();
+        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+        //비번 123으로 등록은 됨. 그러나 시큐리티 로그인 할 수 없음
+        //왜냐면 암호화가 되지 않은 비번에 대해서는 처리안됨
+        user.setPassword(encPassword);
+        memberService.memberInsert(user);
+        return "auth/loginForm";
+    }
 
 }
