@@ -18,4 +18,16 @@ public class MemberDao {
        result = sqlSessionTemplate.insert("memberInsert", user);
        log.info(result);
     }//end of memberInsert
+
+    public User login(String username) {
+        log.info("login");
+        User user = null;
+        try {
+            user = sqlSessionTemplate.selectOne("login", username);
+            log.info(user.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return user;
+    }//end of login
 }
