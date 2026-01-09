@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Log4j2
 @Controller //- 각 메서드가 view를 리턴한다.
 public class IndexController {
+    //http://localhost:8000 or http://localhost:8000/
     @GetMapping({"","/"})
     public String index(){
         log.info("index");
@@ -18,22 +19,34 @@ public class IndexController {
         // @Controller => 문자열이 출력으로 나갈 화면 이름이다.
         return "index";// -> ViewResolver
     }//end of home
+    //http://localhost:8000/user
     @GetMapping("/user")
     public String user(){
         log.info("home");
         return "home";
     }//end of home
+    //http://localhost:8000/manager
     @GetMapping("/manager")
     public String manager(){
         log.info("manager");
         return "manager";
     }//end of home
+    //http://localhost:8000/admin
     @GetMapping("/admin")
     public String admin(){
         log.info("admin");
         return "admin";
     }//end of home
+    //로그인 화면 요청하기
+    //http://localhost:8000/loginForm
+    @GetMapping("/loginForm")
+    public String loginForm(){
+        log.info("loginForm");
+        return "auth/loginForm";
+    }//end of loginForm
+
     //회원가입 화면 호출하기
+    //http://localhost:8000/joinForm
     @GetMapping("/joinForm")
     public String joinForm(){
         log.info("joinForm");
@@ -42,10 +55,11 @@ public class IndexController {
         // 접미어     -> .jsp
         return "auth/joinForm";
     }
+    //http://localhost:8000/login-error
     @GetMapping("/login-error")
     public String loginError(){
         log.info("login-error");
         return "loginError";
-    }
+    }//end of loginError
 
 }
