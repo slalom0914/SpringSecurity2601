@@ -13,6 +13,9 @@ public class IndexController {
     public String index(){
         log.info("index");
         //-> /WEB-INF/views/{{index}}.jsp
+        // 어노테이션이 RestController에서 Controller 변경됨
+        // @RestController = @Controller + @ResponseBody -> 문자열 포맷
+        // @Controller => 문자열이 출력으로 나갈 화면 이름이다.
         return "index";// -> ViewResolver
     }//end of home
     @GetMapping("/user")
