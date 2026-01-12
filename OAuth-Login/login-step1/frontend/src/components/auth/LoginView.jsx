@@ -20,7 +20,7 @@ const LoginView = () => {
     const loginG = async() => {
         console.log('구글 로그인');
         const googleUrl = "https://accounts.google.com/o/oauth2/auth"
-        const googleClientId = "534475116931-6nr3fu9g1turp8a55i86vfkepts3b7nf.apps.googleusercontent.com"
+        const googleClientId = `${import.meta.env.VITE_GOOGLE_CLIENTID}`
         const googleRedirectUrl = "http://localhost:3000/oauth/google/redirect"
         const googleScope = "openid profile email"
         try {

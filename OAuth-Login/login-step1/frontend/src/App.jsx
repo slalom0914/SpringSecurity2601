@@ -10,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginView />} />
+        <Route path="/oauth/google/redirect" element={<GoogleRedirect />} />
       </Routes>
     </>
   )
