@@ -4,6 +4,7 @@ import com.example.demo.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 /*
@@ -25,19 +26,37 @@ public class PrincipalDetails implements UserDetails {
     public PrincipalDetails(User user) {
         this.user = user;
     }
+    // 점검해야 할 포인트
+    // DB설계시 role문자열 형식
+    // Spring Security에서 .hasRole("ADMIN"), .hasRole("USER")은 내부적으로
+    // "ROLE_ADMIN", "ROLE_USER"
+    // 권장: DB에 "ROLE_ADMIN"형태로 저장하거나, getAuthority()에서 "ROLE_"를 붙여서 반환
+    // return "ROLE_"+user.getRole()
+    //시큐리티가 이 사용자가 어떤 권한을 가졌는지 알아야 한다.
+    //로그인 성공시 토큰안에 권한 목록을 채울 때 사용됨
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
+        Collection<GrantedAuthority> collect = new ArrayList<>();
+        collect.add(new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                return user.getRole();//ROLE_ADMIN, ROLE_USER, ROLE_MANAGER
+            }
+        });
+        return collect;
+    }//end of getAuthorities
 
     @Override
     public String getPassword() {
-        return "";
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return user.getUsername();
+    }
+    public String getEmail(){
+        return user.getEmail();
     }
     // 계정 관련 상태 체크용 메서드
     // true: 만료 아님(로그인 가능)
