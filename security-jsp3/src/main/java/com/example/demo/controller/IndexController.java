@@ -102,15 +102,15 @@ public class IndexController {
     @PostMapping("/join")
     public String join(User user){
         log.info("join");
-        user.setRole("ROLE_USER");
+        user.setRole("ROLE_MANAGER");
         // 패스워드 암호화 하기
-        String rawPassword = user.getPassword();
-        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+        String rawPassword = user.getPassword();//평문암호- 처리안됨
+        String encPassword = bCryptPasswordEncoder.encode(rawPassword);//암호화 알고리즘
         //비번 123으로 등록은 됨. 그러나 시큐리티 로그인 할 수 없음
         //왜냐면 암호화가 되지 않은 비번에 대해서는 처리안됨
         user.setPassword(encPassword);
         memberService.memberInsert(user);
-        return "redirect:/auth/loginForm";//회원가입이 되면 이요청을 보냄
+        return "redirect:/auth/loginForm.jsp";//회원가입이 되면 이요청을 보냄
     }
 
 }
