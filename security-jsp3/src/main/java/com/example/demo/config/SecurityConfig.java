@@ -2,10 +2,14 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,14 +25,44 @@ public class SecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+/*
+    로우 하이어라키란?
+    상위 권한이 하위 권한을 자동으로 포함하도록 만드는 권한 구조를 말함.
+    즉, 관리자 권한이면 사용자 권한도 당연히 갖게된다.
+    1)로그인 성공 -> 2)사용자 권한 반환(UserDetails.getAuthorities())
+    3)spring security가 RoleHierachy를 적용
+    4)상위권한 -> 하위권한 자동 확장
+    5)인가(hasRole, hasAuthority()판단시 반영
+    최종 효과<br>
+     - /user/** : USER 이상(= USER, MANAGER, ADMIN)
+     - /manager/** : MANAGER 이상(= MANAGER, ADMIN)
+     - /admin/** : ADMIN만
+*/
+    @Bean
+    RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl rh = new RoleHierarchyImpl();
+        rh.setHierarchy("""
+        ROLE_ADMIN > ROLE_MANAGER 
+        ROLE_MANAGER > ROLE_USER
+    """);
+        return rh;
+    }
+
+    @Bean
+    GrantedAuthoritiesMapper authoritiesMapper(RoleHierarchy roleHierarchy) {
+        // 로그인 시 ADMIN이면 MANAGER/USER 권한을 자동으로 '추가' 부여
+        return new RoleHierarchyAuthoritiesMapper(roleHierarchy);
+    }
+
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/user/**").authenticated()
-                        .requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/user/**").authenticated()//인증만 되면 모두 다 접근가능
+                        .requestMatchers("/manager/**").hasRole("MANAGER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/joinForm", "join").permitAll()//권한없이 접근가능함
                         .anyRequest().permitAll())
                 .formLogin(form -> form
                         .loginPage("/loginForm") //사용자 정의한 로그인 페이지
@@ -44,7 +78,9 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/") //로그아웃 후 이동할 URL
                         .invalidateHttpSession(true) //세션 무효화(기본값 true)
                         .deleteCookies("JSESSIONID")//쿠키 삭제
-                        .permitAll());
+                        .permitAll()
+                )
+                .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"));
         return http.build();
     }// end of defaultSecurityFilterChain
 }
