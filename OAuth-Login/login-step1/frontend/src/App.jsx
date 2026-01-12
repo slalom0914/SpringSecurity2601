@@ -2,6 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import { Route, Routes } from "react-router-dom"
 import HomePage from "./components/pages/HomePage"
 import LoginView from "./components/auth/LoginView"
+import GoogleRedirect from "./components/auth/GoogleRedirect"
 
 function App() {
 
