@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 // 스포츠 센터
 // 역할(ROLE - 인가) : user, manager ,admin
 
@@ -29,10 +30,11 @@ public class IndexController {
         return "index";// -> ViewResolver
     }//end of home
     //http://localhost:8000/user
+    //@RestController =  @Controller + @ResponseBody
     @GetMapping("/user")
-    public String user(){
-        log.info("home");
-        return "home";
+    public @ResponseBody String user(){
+        log.info("user");
+        return "user";
     }//end of home
     //http://localhost:8000/manager
     @GetMapping("/manager")
@@ -66,9 +68,9 @@ public class IndexController {
     }
     //http://localhost:8000/login-error
     @GetMapping("/login-error")
-    public String loginError(){
+    public @ResponseBody String loginError(){
         log.info("login-error");
-        return "loginError";
+        return "아이디나 비밀번호가 맞지 않습니다.";
     }//end of loginError
     //회원가입 구현하기
     @PostMapping("/join")
